@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+
+<project name="research" basedir="." default="Query_Ad_SimRank">
+
+	<property name="src.java" value="src" />
+	<property name="src.test" value="src/test" />
+	<property name="lib.dir" value="lib" />
+	<property name="dist.dir" value="dist" />
+	<property name="build.dir" value="build" />
+	<property name="test.reports" value="reports" /> 
+	<property name="test.dir" value="${build.dir}/test" />
+		
+<!--Target test-->
+	<target name="test" depends="compile">
+		<junit failureProperty="test.failure">
+			<classpath>
+				<pathelement location="${build.dir}/classes" />
+				<pathelement location="${test.dir}/classes" />
+				<fileset dir="lib" />
+			</classpath>
+			<formatter type="xml" />
+			<batchtest>
+				<fileset dir="${test.dir}/classes" includes="**/Test*.class" />
+			</batchtest>
+		</junit>
+        <junitreport todir="${test.reports}">
+            <fileset dir="${test.reports}">
+                <include name="TEST-*.xml" />
+            </fileset>
+            <report todir="${test.reports}" />
+        </junitreport>
+		<fail message="test failed" if="test.failure" />
+	</target>
+	
+<!--Target compile-->
+	<target name="compile" description="Compile main source tree java files" depends="">
+		
+		<mkdir dir="${build.dir}/classes" />
+		<mkdir dir="${test.dir}/classes" />
+		
+        	<javac encoding="utf-8" srcdir="${src.java}/com/alimama/loganalyzer/common:${src.java}/com/alimama/loganalyzer/tester/:${src.java}/com/taobao/research/jobs/common:${src.java}/com/taobao/research/jobs/matrix_multiply:${src.java}/com/taobao/research/jobs/simrank:${src.test}/com/taobao/research/jobs/simrank" destdir="${build.dir}/classes" debug="true" optimize="false" deprecation="false" failonerror="true">	
+			<classpath>
+				<fileset dir="lib" />
+			</classpath>
+		</javac>
+
+		<!-- Copy XML files to ${build.dir}/classes -->
+		<copy todir="${build.dir}/classes">
+			<fileset dir="${src.java}" includes="**/*.xml" />
+		</copy>
+
+	</target>
+	<target name="Query_Ad_SimRank"  depends="compile" description="Query_Ad_SimRank">				        
+				        <copy todir="build/classes" >
+				            <fileset dir="data" >
+				            </fileset>
+				        </copy>
+				               
+						<jar encoding="utf-8"  jarfile="dist\Query_Ad_SimRank.jar" compress="true" 
+							basedir="${build.dir}/classes" 
+							includes="test/**,com/**">
+							<manifest>
+							    <attribute name="Built-By" value="${user.name}"/>
+								<attribute name="Build-Timestamp" value="${build.time}"/>
+							    <attribute name="Build-OS" value="${os.name}"/>
+								<attribute name="Build-OS-Version" value="${os.version}"/>
+								<attribute name="Build-OS-Host" value="${COMPUTERNAME}"/>
+							    <attribute name="Title" value="${ant.project.name}"/>
+							    <attribute name="Vendor" value="Adteractive, Inc."/>
+							</manifest>
+						</jar>
+					</target>
+
+<!--Target clean-->
+	<target name="clean" description="Clean up">
+		<delete dir="build" />
+	</target>
+	
+<!--Target cleantest-->
+	<target name="cleantest" depends="clean,test" />
+
+</project>
